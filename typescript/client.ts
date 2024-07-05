@@ -40,6 +40,7 @@ export abstract class BaseTransport<T = {}>
     if (!handler) return; // TODO: Handle error.
     if (response.error) handler.reject(response.error);
     else handler.resolve(response.result);
+    this._requests.delete(response.id)
   }
 
   notification(method: string, params?: Params): void {

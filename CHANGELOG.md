@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- ts client: fix memory leak
+
 ## 0.5.3 - 2023-12-02
 
 - Update axum
