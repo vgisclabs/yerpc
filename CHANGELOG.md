@@ -2,9 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 0.6.0 - 2024-07-06
 
 - ts client: fix memory leak
+- Update yerpc-derive dependencies
 
 ## 0.5.3 - 2023-12-02
 
