@@ -3,12 +3,13 @@
 #![warn(missing_debug_implementations, missing_docs, clippy::wildcard_imports)]
 
 extern crate darling;
+use darling::ast::NestedMeta;
 use darling::{FromAttributes, FromMeta};
 #[cfg(feature = "openrpc")]
 use openrpc::generate_openrpc_generator;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, Item};
+use syn::{parse_macro_input, Item};
 
 #[cfg(feature = "openrpc")]
 mod openrpc;
@@ -43,10 +44,14 @@ pub fn rpc(attr: TokenStream, tokens: TokenStream) -> TokenStream {
     let item = parse_macro_input!(tokens as Item);
     match &item {
         Item::Impl(input) => {
-            let attr_args = parse_macro_input!(attr as AttributeArgs);
+            let attr_args = match NestedMeta::parse_meta_list(attr.into()) {
+                Ok(v) => v,
+                Err(err) => return TokenStream::from(darling::Error::from(err).write_errors()),
+            };
+
             let attr_args = match RootAttrArgs::from_list(&attr_args) {
                 Ok(args) => args,
-                Err(err) => return err.write_errors().into(),
+                Err(err) => return TokenStream::from(err.write_errors()),
             };
             if attr_args.openrpc_outdir.is_none() && attr_args.ts_outdir.is_none() {
                 return syn::Error::new_spanned(
