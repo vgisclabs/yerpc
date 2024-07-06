@@ -38,7 +38,7 @@ export abstract class BaseTransport<T = {}>
     if (!response.id) return; // TODO: Handle error.
     const handler = this._requests.get(response.id);
     if (!handler) return; // TODO: Handle error.
-    this._requests.delete(response.id)
+    this._requests.delete(response.id);
     if (response.error) handler.reject(response.error);
     else handler.resolve(response.result);
   }
