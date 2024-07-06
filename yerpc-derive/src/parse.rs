@@ -1,7 +1,6 @@
 use super::MethodAttrArgs;
 use darling::FromAttributes;
-// use proc_macro2::Ident;
-use syn::{FnArg, Generics, Ident, ImplItem, ImplItemMethod, ItemImpl, Pat, ReturnType, Type};
+use syn::{FnArg, Generics, Ident, ImplItem, ImplItemFn, ItemImpl, Pat, ReturnType, Type};
 
 use crate::RootAttrArgs;
 
@@ -25,7 +24,7 @@ impl<'s> RpcInfo<'s> {
             .items
             .iter()
             .filter_map(|item| {
-                if let ImplItem::Method(method) = item {
+                if let ImplItem::Fn(method) = item {
                     Some(RemoteProcedure::from_method(attr_args, method))
                 } else {
                     None
@@ -93,10 +92,11 @@ impl<'s> Input<'s> {
 fn parse_doc_comment(attrs: &[syn::Attribute]) -> Option<String> {
     let mut parts = vec![];
     for attr in attrs {
-        let meta = attr.parse_meta().unwrap();
-        if let syn::Meta::NameValue(meta) = meta {
-            if let syn::Lit::Str(doc) = meta.lit {
-                parts.push(doc.value());
+        if let syn::Meta::NameValue(meta) = &attr.meta {
+            if let syn::Expr::Lit(expr_lit) = &meta.value {
+                if let syn::Lit::Str(lit_str) = &expr_lit.lit {
+                    parts.push(lit_str.value());
+                }
             }
         }
     }
@@ -108,7 +108,7 @@ fn parse_doc_comment(attrs: &[syn::Attribute]) -> Option<String> {
 }
 
 impl<'s> RemoteProcedure<'s> {
-    pub fn from_method(root_attr_args: &RootAttrArgs, method: &'s ImplItemMethod) -> Self {
+    pub fn from_method(root_attr_args: &RootAttrArgs, method: &'s ImplItemFn) -> Self {
         let args = MethodAttrArgs::from_attributes(&method.attrs).unwrap_or_default();
         let name = args.name.unwrap_or_else(|| method.sig.ident.to_string());
         let output = match &method.sig.output {
