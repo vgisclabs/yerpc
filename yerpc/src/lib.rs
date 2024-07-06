@@ -18,7 +18,6 @@ pub use typescript::TypeDef;
 pub use version::Version;
 
 mod integrations;
-pub use integrations::*;
 
 #[async_trait]
 pub trait RpcServer: Sync + Send + 'static {
