@@ -58,7 +58,7 @@ impl Method {
 
     pub fn to_string(&self, root_namespace: Option<&str>) -> String {
         let (args, call) = if !self.is_positional {
-            if let Some((name, ty)) = self.args.get(0) {
+            if let Some((name, ty)) = self.args.first() {
                 (
                     format!("{}: {}", name, type_to_expr(ty, root_namespace)),
                     name.to_string(),
